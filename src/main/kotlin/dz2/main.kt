@@ -25,12 +25,31 @@ fun main() {
                 println("Exit")
                 System.exit(0)
             }
-            is CheckHelp -> if (command.isValid()) println("Help") else System.exit(0)
+            is CheckHelp -> if (command.isValid()) println("Help") else {
+                println("Пользователь не захотел больше общаться")
+                System.exit(0)
+            }
             is CheckAdd -> if (command.isValid()) {
-                println("Add")
-
+                val str = command.sendString()
+                if (person.name != str[1]) {
+                    person.name = str[1]
+                    person.phone = ""
+                    person.email = ""
+                }
+                if (str[2] == "phone") person.phone = str[3]
+                else if (str[2] == "email") {
+                    val email = str[3].split('@')
+                    if (email.size > 1) {
+                        person.email = str[3]
+                    } else println("Неверно указан email")
+                } else println("Help")
+                println("Added:")
+                println(person)
             } else println("Help")
-            is CheckShow -> if (command.isValid()) println(person) else println("Not initialized")
+            is CheckShow -> if (command.isValid()) {
+                if (person.name != "")
+                    println(person) else println("Not initialized")
+            } else println("Help")
         }
     }
 }
@@ -51,16 +70,21 @@ class CheckExit(private val string: String) : Command {
     }
 }
 
+//class CheckAdd(private val str0: String, private val str1: String, private val str2: String, private val str3: String) :
 class CheckAdd(private val string: List<String>) : Command {
     override fun isValid(): Boolean {
-//        Проверку телефона и email нужно перенести в эту функцию
-        TODO("Not yet implemented")
+        return string.size == 4
+    }
+
+    fun sendString(): List<String> {
+//        return str0 + " " + str1 + " " + str2 + " " + str3
+        return string
     }
 }
 
 class CheckShow(private val string: List<String>) : Command {
     override fun isValid(): Boolean {
-        return string.size > 1
+        return string.size == 1
     }
 }
 
@@ -69,9 +93,10 @@ fun readCommand(): Command {
     return when (str?.get(0)) {
         "exit" -> CheckExit(str[0])
         "help" -> CheckHelp(str[0])
+//        "add" -> CheckAdd(str[0], str[1], str[2], str[3])
         "add" -> CheckAdd(str)
         "show" -> CheckShow(str)
-        else -> CheckHelp(str?.get(0)!!)    //Хваленый sealed не работает и нужен else c говнокодом
+        else -> CheckHelp(str?.get(0)!!)
     }
 }
 
