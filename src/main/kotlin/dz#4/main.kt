@@ -59,7 +59,7 @@ fun main() {
 
 fun checkExport(str: List<String>, persons: Person) {
     val pr = Tag()
-    println(pr.a(str[1], persons))
+    println(pr.a((str[1])) { val persons1 = persons })
 }
 
 open class Tag {
@@ -71,9 +71,9 @@ open class Tag {
         })
     }
 
-    fun a(href: String, callback: Person) {
+    fun a(href: String, callback: Tag.() -> Unit) {
         children.add(Link(href).apply {
-            callback
+            callback()
         })
     }
 
