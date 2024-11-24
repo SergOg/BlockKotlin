@@ -135,39 +135,6 @@ fun json(block: JsonContext.() -> Unit) = JsonContext().run {
 //    details = Details().apply(block)   //В этой строке 5 ошибок, код не рабочий из https://habr.com/ru/articles/343730/?code=7ab809d818c72288daa310ced4a1e339&state=5V2gZenQnG5l4j1uiRwLIgz7&hl=ru
 //}
 
-
-//open class Tag {
-//    private val children = mutableListOf<Any>()
-//    fun b(callback: Tag.() -> Unit) {
-//        children.add(Bold().apply {
-//            callback()
-//        })
-//    }
-//
-//    fun a(href: String, callback: Tag.() -> Unit) {
-//        children.add(Link(href).apply {
-//            callback()
-//        })
-//    }
-//
-//    fun text(text: String): List<Any> {
-//        children.add(text)
-//        return children
-//    }
-//}
-//
-//class Link(private val url: String) : Tag() {
-//    override fun toString(): String {
-//        return url
-//    }
-//}
-//
-//class Bold() : Tag() {
-//    override fun toString(): String {
-//        return " "
-//    }
-//}
-
 fun checkAddEmail(str: List<String>, persons: Person) {
     persons.nameSet.add(str[1])
     val email = str[2].split('@')
