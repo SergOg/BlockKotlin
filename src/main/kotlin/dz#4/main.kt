@@ -60,8 +60,10 @@ fun main() {
 }
 
 fun checkExport(str: List<String>, persons: Person) {
+    val exitJson = mutableListOf<Any>()
     for (item in persons.nameSet) {
         val j = json {
+
             "name" to item
             "phones" toJson {
                 val phone = persons.phoneMap.filterValues { it == item }
@@ -78,13 +80,14 @@ fun checkExport(str: List<String>, persons: Person) {
                 }
             }
         }
-        println(j)
-        val fileName = str[1]
-        try {
-            File(fileName).writeText(j)
-        } catch (e: IOException) {
-            throw MyException("Unable to write file $fileName", e)
-        }
+        exitJson.add(j)
+    }
+    println(exitJson)
+    val fileName = str[1]
+    try {
+        File(fileName).writeText(exitJson.toString())
+    } catch (e: IOException) {
+        throw MyException("Unable to write file $fileName", e)
     }
 }
 
@@ -277,13 +280,4 @@ data class Person(
     val nameSet: MutableSet<String> = mutableSetOf(),
     val phoneMap: MutableMap<String, String> = mutableMapOf(),
     val emailMap: MutableMap<String, String> = mutableMapOf()
-)
-
-data class Export(
-    var name: String = "",
-)
-
-data class Details(
-    var phone: String = "",
-    var email: String = ""
 )

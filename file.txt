@@ -1,9 +1,18 @@
-{
+[{
     "name": "Vasa",
     "phones": {
-        "number": "1234324325"
+        "number": "+12324234",
+        "number": "+678678"
     },
     "email": {
 
     }
-}
+}, {
+    "name": "Sara",
+    "phones": {
+        "number": "+89896789"
+    },
+    "email": {
+
+    }
+}]
