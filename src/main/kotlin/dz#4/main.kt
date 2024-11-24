@@ -1,3 +1,5 @@
+import java.io.File
+import java.io.IOException
 import kotlin.system.exitProcess
 
 /*За основу берём код решения домашнего задания из предыдущего семинара и дорабатываем его.
@@ -58,42 +60,110 @@ fun main() {
 }
 
 fun checkExport(str: List<String>, persons: Person) {
-    val pr = Tag()
-    println(pr.a((str[1])) { val persons1 = persons })
-}
-
-open class Tag {
-    protected val children = mutableListOf<Any>()
-
-    fun b(callback: Tag.() -> Unit) {
-        children.add(Bold().apply {
-            callback()
-        })
-    }
-
-    fun a(href: String, callback: Tag.() -> Unit) {
-        children.add(Link(href).apply {
-            callback()
-        })
-    }
-
-    fun text(text: String) : List<Any>{
-        children.add(text)
-        return children
-    }
-}
-
-class Link(private val url: String) : Tag() {
-    override fun toString(): String {
-        return "jhgiyufiyutd7980tdiyrtd"
+    for (item in persons.nameSet) {
+        val j = json {
+            "name" to item
+            "phones" toJson {
+                val phone = persons.phoneMap.filterValues { it == item }
+                for (ent in phone) {
+                    val (key, value) = ent
+                    "number" to key
+                }
+            }
+            "email" toJson {
+                val email = persons.emailMap.filterValues { it == item }
+                for (eml in email) {
+                    val (key, value) = eml
+                    "address" to key
+                }
+            }
+        }
+        println(j)
+        val fileName = str[1]
+        try {
+            File(fileName).writeText(j)
+        } catch (e: IOException) {
+            throw MyException("Unable to write file $fileName", e)
+        }
     }
 }
 
-class Bold() : Tag() {
-    override fun toString(): String {
-        return "j4574567457"
+class MyException : IOException {
+    constructor(message: String) : super(message)
+    constructor(message: String, cause: Throwable) : super(message, cause)
+}
+
+class JsonContext internal constructor() {
+    internal val output = StringBuilder()
+    private var indentation = 4
+    private fun StringBuilder.indent() = apply {
+        for (i in 1..indentation)
+            append(' ')
+    }
+
+    private var needsSeparator = false
+    private fun StringBuilder.separator() = apply {
+        if (needsSeparator) append(",\n")
+    }
+
+    infix fun String.to(value: Any) {
+        output.separator().indent().append("\"$this\": \"$value\"")
+        needsSeparator = true
+    }
+
+    infix fun String.toJson(block: JsonContext.() -> Unit) {
+        output.separator().indent().append("\"$this\": {\n")
+        indentation += 4
+        needsSeparator = false
+        block(this@JsonContext)
+        needsSeparator = true
+        indentation -= 4
+        output.append("\n").indent().append("}")
     }
 }
+
+fun json(block: JsonContext.() -> Unit) = JsonContext().run {
+    block()
+    "{\n" + output.toString() + "\n}"
+}
+
+//fun pers(block: Export.() -> Unit): Export = Export().apply(block)
+//fun Export.details(block: Details.() -> Unit) {
+//    details = Details().apply(block)   //В этой строке 5 ошибок, код не рабочий из https://habr.com/ru/articles/343730/?code=7ab809d818c72288daa310ced4a1e339&state=5V2gZenQnG5l4j1uiRwLIgz7&hl=ru
+//}
+
+
+//open class Tag {
+//    private val children = mutableListOf<Any>()
+//    fun b(callback: Tag.() -> Unit) {
+//        children.add(Bold().apply {
+//            callback()
+//        })
+//    }
+//
+//    fun a(href: String, callback: Tag.() -> Unit) {
+//        children.add(Link(href).apply {
+//            callback()
+//        })
+//    }
+//
+//    fun text(text: String): List<Any> {
+//        children.add(text)
+//        return children
+//    }
+//}
+//
+//class Link(private val url: String) : Tag() {
+//    override fun toString(): String {
+//        return url
+//    }
+//}
+//
+//class Bold() : Tag() {
+//    override fun toString(): String {
+//        return " "
+//    }
+//}
 
 fun checkAddEmail(str: List<String>, persons: Person) {
     persons.nameSet.add(str[1])
@@ -207,4 +277,13 @@ data class Person(
     val nameSet: MutableSet<String> = mutableSetOf(),
     val phoneMap: MutableMap<String, String> = mutableMapOf(),
     val emailMap: MutableMap<String, String> = mutableMapOf()
+)
+
+data class Export(
+    var name: String = "",
+)
+
+data class Details(
+    var phone: String = "",
+    var email: String = ""
 )

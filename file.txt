@@ -1,0 +1,9 @@
+{
+    "name": "Vasa",
+    "phones": {
+        "number": "1234324325"
+    },
+    "email": {
+
+    }
+}
